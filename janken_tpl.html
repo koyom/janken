@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最後の神頼み</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #ffd700, #ffc107); /* 初期背景色 */
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body.black-background {
+            background: #000; /* 真っ黒の背景色 */
+        }
+
+        h1 {
+            color: #8B4513;
+            margin-top: 50px;
+            font-size: 240px;
+        }
+
+        label {
+            color: #8B4513;
+            font-size: 80px;
+            margin-top: 20px;
+            margin-bottom: 80px;
+            display: block;
+        }
+
+        #selectTimes {
+            font-size: 80px;
+            padding: 30px;
+            margin-top: 20px;
+            margin-bottom: 240px;
+        }
+
+        #submitBtn {
+            background-color: #8B4513;
+            color: white;
+            padding: 30px 80px;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 60px;
+        }
+
+        #retryBtn {
+            background-color: #8B4513;
+            color: white;
+            padding: 60px 120px;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 60px;
+        }
+
+        #choices {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+        }
+
+        .choice img {
+            width: 480px;
+            height: 480px;
+            cursor: pointer;
+            border: 6px solid #8B4513;
+            border-radius: 20px;
+        }
+
+        #result {
+            margin-top: 120px;
+            font-weight: bold;
+            color: white;
+            font-size: 56px;
+        }
+
+        #computer-choice {
+            margin-top: 50px;
+        }
+
+        #computer-choice p {
+            color: #8B4513;
+            font-size: 120px;
+        }
+
+        #computer-img {
+            width: 480px;
+            height: 480px;
+            border: 6px solid #8B4513;
+            border-radius: 20px;
+        }
+
+        #goddess-img {
+            margin-top: 50px;
+            display: none;
+            width: 300px;
+            height: auto;
+            border: 6px solid #8B4513;
+            border-radius: 20px;
+        }
+
+        /* 悪魔の画像スタイル */
+        #devil-img {
+            margin-top: 50px;
+            display: none;
+            width: 300px;
+            height: auto;
+            border: 6px solid #8B4513;
+            border-radius: 20px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+    <h1>最後の神頼み</h1>
+
+    <label for="selectTimes">その選択に対してこれまでじゃんけんをした回数を選んでください：</label>
+    <select id="selectTimes">
+        <option value="1">1回目</option>
+        <option value="2">2回目</option>
+        <option value="3">3回目</option>
+    </select>
+
+    <button id="submitBtn">選択完了</button>
+    
+    <div id="choices">
+        <div class="choice" data-choice="rock"><img src="rock.png" alt="Rock"></div>
+        <div class="choice" data-choice="scissors"><img src="scissors.png" alt="Scissors"></div>
+        <div class="choice" data-choice="paper"><img src="paper.png" alt="Paper"></div>
+    </div>
+
+    <div id="computer-choice">
+        <p>God's Choice:</p>
+        <img id="computer-img" alt="God's Choice">
+    </div>
+    
+    <div id="result"></div>
+
+    <!-- 女神の画像を追加 -->
+    <img id="goddess-img" src="goddess.png" alt="Goddess">
+    
+    <!-- 悪魔の画像を追加 -->
+    <img id="devil-img" src="devil.png" alt="Devil">
+
+    <script>
+        $(document).ready(function() {
+            // ゲームが終了したかどうかを示すフラグ
+            var gameEnded = true;
+
+            // プレイヤーの選択
+            $(".choice").on("click", function() {
+                // ゲームが終了していない場合のみプレイヤーの選択を処理
+                if (!gameEnded) {
+                    var playerChoice = $(this).data("choice");
+                    playGame(playerChoice);
+                }
+            });
+
+            // じゃんけんのロジック
+            function playGame(playerChoice) {
+                var choices = ["rock", "paper", "scissors"];
+                var computerChoice = choices[Math.floor(Math.random() * 3)];
+                
+                // プレイヤーとコンピューターの選択を表示
+                $("#result").text("You: " + playerChoice + ", God: " + computerChoice);
+                
+                // コンピューターの選択画像を表示
+                var computerImgPath = computerChoice + ".png";
+                $("#computer-img").attr("src", computerImgPath);
+
+                // 勝敗判定
+                if (playerChoice === computerChoice) {
+                    $("#result").append("<br>引き分け");
+                    // 引き分けの場合は初期背景に戻す
+                    $("body").removeClass("black-background");
+                } else if (
+                    (playerChoice === "rock" && computerChoice === "scissors") ||
+                    (playerChoice === "paper" && computerChoice === "rock") ||
+                    (playerChoice === "scissors" && computerChoice === "paper")
+                ) {
+                    $("#result").append("<br>貴方の勝ち。その決断にどこまでもご一緒しましょう");
+                    $("#goddess-img").show();
+                    $("#devil-img").hide(); // 悪魔の画像を非表示
+                    // 背景色を変更
+                    $("body").css("background", "url('goddess-background.jpg') no-repeat center center fixed");
+                    $("body").css("background-size", "cover");
+                } else {
+                    // 3回以上の場合、「終了」メッセージを表示
+                    if ($("#selectTimes").val() === "3") {
+                        $("#result").append("<br>サポートはできないがそれでも続ける意志があるなら進みなさい");
+                        $("body").css("background", "url('death-background.jpg') no-repeat center center fixed");
+                        // 3回目の選択で負けた場合は「もう一度占う」ボタンを非表示
+                        hideRetryButton();
+                    } else {
+                        $("#result").append("<br>貴方の負け。もう一度考えて出直しなさい");
+                        $("#devil-img").show(); // 悪魔の画像を表示
+                        // 背景色を悪魔の背景に変更
+                        $("body").css("background", "url('devil-background.jpg') no-repeat center center fixed");
+                    }
+                    $("body").css("background-size", "cover");
+                }
+
+                // ゲームが終了したらリトライボタンを表示
+                
+                showRetryButton();
+                // ゲーム終了
+                gameEnded = true;
+            }
+
+            // ゲームをリセットする関数
+            function resetGame() {
+                // 背景色を初期に戻す
+                $("body").removeClass("black-background");
+                $("body").css("background", "linear-gradient(to bottom, #ffd700, #ffc107)");
+                // 結果メッセージをクリア
+                $("#result").empty();
+                // リトライボタンを非表示
+                $("#retryBtn").remove();
+                // ゲーム再開
+                gameEnded = false;
+            }
+
+            // リトライボタンを表示する関数
+            function showRetryButton() {
+                // リトライボタンが存在しない場合のみ表示
+                if ($("#retryBtn").length === 0) {
+                    $("#result").append("<br><button id='retryBtn'>もう一度占う</button>");
+                    // リトライボタンがクリックされたときの処理
+                    $("#retryBtn").on("click", function() {
+                        // ゲームをリセット
+                        resetGame();
+                        // ゲーム再開
+                        gameEnded = false;
+                    });
+                }
+            }
+
+            // リトライボタンを非表示にする関数
+            function hideRetryButton() {
+                $("#retryBtn").remove();
+            }
+
+            // ボタンがクリックされたときの処理
+            $("#submitBtn").on("click", function() {
+                // 選択された回数を取得
+                var selectedTimes = $("#selectTimes").val();
+
+                // 選択された回数に応じて処理を実行
+                if (selectedTimes === "1") {
+                    alert("貴方のその選択肢占ってみましょう");
+                } else if (selectedTimes === "2") {
+                    alert("しっかり考え直してきましたか？");
+                } else if (selectedTimes === "3") {
+                    alert("これがラストチャンスです");
+                } else {
+                    alert("無効な選択です。");
+                }
+
+                // ゲームをリセット
+                resetGame();
+            });
+        });
+    </script>
+</body>
+</html>
